@@ -1,8 +1,8 @@
-# YouTube Transcript DL MCP Server
+# 🎬 YouTube Transcript DL MCP Server
 
 A comprehensive MCP (Model Context Protocol) server for extracting YouTube video transcripts with support for multiple transports (stdio, SSE, HTTP), Docker deployment, and npm package distribution.
 
-## Features
+## ✨ Features
 
 - 🎯 **Multiple Transport Support**: stdio, Server-Sent Events (SSE), and HTTP
 - 📹 **Comprehensive Transcript Extraction**: Single videos, bulk processing, and playlists
@@ -14,15 +14,15 @@ A comprehensive MCP (Model Context Protocol) server for extracting YouTube video
 - 🧪 **Test-Driven Development**: Comprehensive test suite with 90%+ coverage
 - 🔧 **TypeScript**: Full type safety and modern JavaScript features
 
-## Installation
+## 📦 Installation
 
-### As an npm package
+### 🔧 As an npm package
 
 ```bash
 npm install -g yt-transcript-dl-mcp
 ```
 
-### From source
+### 🛠️ From source
 
 ```bash
 git clone <repository-url>
@@ -31,7 +31,7 @@ npm install
 npm run build
 ```
 
-### Docker
+### 🐳 Docker
 
 ```bash
 # From GitHub Container Registry (recommended)
@@ -43,9 +43,9 @@ docker build -t yt-transcript-dl-mcp .
 docker run -p 3001:3001 -p 3002:3002 yt-transcript-dl-mcp --multi-transport
 ```
 
-## Usage
+## 🚀 Usage
 
-### MCP Server
+### 🖥️ MCP Server
 
 Start the MCP server in different modes:
 
@@ -63,7 +63,7 @@ yt-transcript-dl-mcp start --transport http --port 3000
 yt-transcript-dl-mcp start --verbose
 ```
 
-### CLI Tool
+### 💻 CLI Tool
 
 Test the server with a sample video:
 
@@ -78,7 +78,7 @@ yt-transcript-dl-mcp test dQw4w9WgXcQ --language es
 yt-transcript-dl-mcp test dQw4w9WgXcQ --format srt
 ```
 
-### Programmatic Usage
+### 🔧 Programmatic Usage
 
 ```typescript
 import { YouTubeTranscriptService } from 'yt-transcript-dl-mcp';
@@ -98,7 +98,7 @@ const bulkResult = await service.getBulkTranscripts({
 console.log(bulkResult);
 ```
 
-## MCP Tools
+## 🛠️ MCP Tools
 
 The server provides the following MCP tools:
 
@@ -141,9 +141,9 @@ Get cache statistics and performance metrics.
 ### `clear_cache`
 Clear the transcript cache.
 
-## Configuration
+## ⚙️ Configuration
 
-### Environment Variables
+### 🌍 Environment Variables
 
 ```bash
 # Server configuration
@@ -169,7 +169,7 @@ LOG_LEVEL=info
 LOG_FORMAT=simple
 ```
 
-### Configuration File
+### 📝 Configuration File
 
 Create a `config.json` file:
 
@@ -197,9 +197,9 @@ Create a `config.json` file:
 }
 ```
 
-## Docker Deployment
+## 🐳 Docker Deployment
 
-### Docker Compose
+### 🐙 Docker Compose
 
 ```yaml
 version: '3.8'
