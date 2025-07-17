@@ -30,7 +30,7 @@ jobs:
         run: npm run lint
 
       - name: Run tests with coverage
-        run: echo "Tests temporarily disabled - GHCR fix priority"
+        run: npm run test:coverage
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

@@ -58,11 +58,8 @@ USER nodejs
 # Expose port
 EXPOSE 3000
 
-# Health check - create a simple health check file
-RUN echo 'console.log("healthy"); process.exit(0);' > dist/health-check.js
-
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD node dist/health-check.js || exit 1
+  CMD node -e "console.log('healthy'); process.exit(0);" || exit 1
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]

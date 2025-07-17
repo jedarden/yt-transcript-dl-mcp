@@ -3,7 +3,7 @@ import { YouTubeTranscriptMCPServer } from '../../src/server/mcp-server';
 import { YouTubeTranscriptService } from '../../src/services/youtube-transcript.service';
 
 // Mock external dependencies
-jest.mock('youtube-captions-scraper');
+jest.mock('youtube-transcript');
 jest.mock('../../src/utils/logger');
 
 describe('End-to-End Integration Tests', () => {
@@ -19,28 +19,22 @@ describe('End-to-End Integration Tests', () => {
   describe('Complete workflow', () => {
     it('should handle complete single video transcript workflow', async () => {
       // Mock the YouTube API response
-      const mockSubtitles = [
-        { text: 'Welcome to our video', start: '0.0', dur: '3.0' },
-        { text: 'Today we will discuss', start: '3.0', dur: '2.5' },
-        { text: 'the importance of testing', start: '5.5', dur: '3.5' }
+      const mockTranscript = [
+        { text: 'Welcome to our video', start: 0.0, duration: 3.0 },
+        { text: 'Today we will discuss', start: 3.0, duration: 2.5 },
+        { text: 'the importance of testing', start: 5.5, duration: 3.5 }
       ];
 
-      const mockVideoDetails = {
-        title: 'Testing Best Practices'
-      };
-
-      const { getSubtitles, getVideoDetails } = await import('youtube-captions-scraper');
-      (getSubtitles as jest.MockedFunction<typeof getSubtitles>)
-        .mockResolvedValue(mockSubtitles);
-      (getVideoDetails as jest.MockedFunction<typeof getVideoDetails>)
-        .mockResolvedValue(mockVideoDetails);
+      const { YoutubeTranscript } = await import('youtube-transcript');
+      (YoutubeTranscript.fetchTranscript as jest.MockedFunction<typeof YoutubeTranscript.fetchTranscript>)
+        .mockResolvedValue(mockTranscript);
 
       // Test the service directly
       const result = await transcriptService.getTranscript('dQw4w9WgXcQ', 'en', 'json');
 
       expect(result).toEqual({
         videoId: 'dQw4w9WgXcQ',
-        title: 'Testing Best Practices',
+        title: expect.any(String),
         language: 'en',
         transcript: [
           { text: 'Welcome to our video', start: 0.0, duration: 3.0 },
@@ -49,26 +43,20 @@ describe('End-to-End Integration Tests', () => {
         ],
         metadata: {
           extractedAt: expect.any(String),
-          source: 'youtube-captions-scraper',
+          source: 'youtube-transcript',
           duration: 9.0
         }
       });
     });
 
     it('should handle bulk processing workflow', async () => {
-      const mockSubtitles = [
-        { text: 'Test content', start: '0.0', dur: '2.0' }
+      const mockTranscript = [
+        { text: 'Test content', start: 0.0, duration: 2.0 }
       ];
 
-      const mockVideoDetails = {
-        title: 'Test Video'
-      };
-
-      const { getSubtitles, getVideoDetails } = await import('youtube-captions-scraper');
-      (getSubtitles as jest.MockedFunction<typeof getSubtitles>)
-        .mockResolvedValue(mockSubtitles);
-      (getVideoDetails as jest.MockedFunction<typeof getVideoDetails>)
-        .mockResolvedValue(mockVideoDetails);
+      const { YoutubeTranscript } = await import('youtube-transcript');
+      (YoutubeTranscript.fetchTranscript as jest.MockedFunction<typeof YoutubeTranscript.fetchTranscript>)
+        .mockResolvedValue(mockTranscript);
 
       const request = {
         videoIds: ['dQw4w9WgXcQ', 'jNQXAC9IVRw'],
@@ -85,14 +73,14 @@ describe('End-to-End Integration Tests', () => {
     });
 
     it('should handle different output formats', async () => {
-      const mockSubtitles = [
-        { text: 'Hello world', start: '0.0', dur: '2.5' },
-        { text: 'Testing formats', start: '2.5', dur: '3.0' }
+      const mockTranscript = [
+        { text: 'Hello world', start: 0.0, duration: 2.5 },
+        { text: 'Testing formats', start: 2.5, duration: 3.0 }
       ];
 
-      const { getSubtitles } = await import('youtube-captions-scraper');
-      (getSubtitles as jest.MockedFunction<typeof getSubtitles>)
-        .mockResolvedValue(mockSubtitles);
+      const { YoutubeTranscript } = await import('youtube-transcript');
+      (YoutubeTranscript.fetchTranscript as jest.MockedFunction<typeof YoutubeTranscript.fetchTranscript>)
+        .mockResolvedValue(mockTranscript);
 
       const transcript = [
         { text: 'Hello world', start: 0.0, duration: 2.5 },
@@ -117,8 +105,8 @@ describe('End-to-End Integration Tests', () => {
 
     it('should handle error scenarios gracefully', async () => {
       // Mock API failure
-      const { getSubtitles } = await import('youtube-captions-scraper');
-      (getSubtitles as jest.MockedFunction<typeof getSubtitles>)
+      const { YoutubeTranscript } = await import('youtube-transcript');
+      (YoutubeTranscript.fetchTranscript as jest.MockedFunction<typeof YoutubeTranscript.fetchTranscript>)
         .mockRejectedValue(new Error('Video not found'));
 
       const result = await transcriptService.getTranscript('invalid-video', 'en', 'json');
@@ -129,17 +117,14 @@ describe('End-to-End Integration Tests', () => {
     });
 
     it('should handle mixed success and failure in bulk processing', async () => {
-      const mockSubtitles = [
-        { text: 'Success video', start: '0.0', dur: '2.0' }
+      const mockTranscript = [
+        { text: 'Success video', start: 0.0, duration: 2.0 }
       ];
 
-      const { getSubtitles, getVideoDetails } = await import('youtube-captions-scraper');
-      (getSubtitles as jest.MockedFunction<typeof getSubtitles>)
-        .mockResolvedValueOnce(mockSubtitles)
+      const { YoutubeTranscript } = await import('youtube-transcript');
+      (YoutubeTranscript.fetchTranscript as jest.MockedFunction<typeof YoutubeTranscript.fetchTranscript>)
+        .mockResolvedValueOnce(mockTranscript)
         .mockRejectedValueOnce(new Error('Video not found'));
-
-      (getVideoDetails as jest.MockedFunction<typeof getVideoDetails>)
-        .mockResolvedValue({ title: 'Success Video' });
 
       const request = {
         videoIds: ['valid-video', 'invalid-video'],
@@ -159,15 +144,13 @@ describe('End-to-End Integration Tests', () => {
 
   describe('Cache behavior', () => {
     it('should cache successful results', async () => {
-      const mockSubtitles = [
-        { text: 'Cached content', start: '0.0', dur: '2.0' }
+      const mockTranscript = [
+        { text: 'Cached content', start: 0.0, duration: 2.0 }
       ];
 
-      const { getSubtitles, getVideoDetails } = await import('youtube-captions-scraper');
-      (getSubtitles as jest.MockedFunction<typeof getSubtitles>)
-        .mockResolvedValue(mockSubtitles);
-      (getVideoDetails as jest.MockedFunction<typeof getVideoDetails>)
-        .mockResolvedValue({ title: 'Cached Video' });
+      const { YoutubeTranscript } = await import('youtube-transcript');
+      (YoutubeTranscript.fetchTranscript as jest.MockedFunction<typeof YoutubeTranscript.fetchTranscript>)
+        .mockResolvedValue(mockTranscript);
 
       // First call should hit the API
       const result1 = await transcriptService.getTranscript('dQw4w9WgXcQ', 'en', 'json');
@@ -176,7 +159,7 @@ describe('End-to-End Integration Tests', () => {
       const result2 = await transcriptService.getTranscript('dQw4w9WgXcQ', 'en', 'json');
 
       expect(result1).toEqual(result2);
-      expect(getSubtitles).toHaveBeenCalledTimes(1);
+      expect(YoutubeTranscript.fetchTranscript).toHaveBeenCalledTimes(1);
     });
 
     it('should provide cache statistics', () => {
@@ -192,15 +175,13 @@ describe('End-to-End Integration Tests', () => {
 
   describe('URL parsing', () => {
     it('should extract video IDs from various URL formats', async () => {
-      const mockSubtitles = [
-        { text: 'URL test', start: '0.0', dur: '1.0' }
+      const mockTranscript = [
+        { text: 'URL test', start: 0.0, duration: 1.0 }
       ];
 
-      const { getSubtitles, getVideoDetails } = await import('youtube-captions-scraper');
-      (getSubtitles as jest.MockedFunction<typeof getSubtitles>)
-        .mockResolvedValue(mockSubtitles);
-      (getVideoDetails as jest.MockedFunction<typeof getVideoDetails>)
-        .mockResolvedValue({ title: 'URL Test' });
+      const { YoutubeTranscript } = await import('youtube-transcript');
+      (YoutubeTranscript.fetchTranscript as jest.MockedFunction<typeof YoutubeTranscript.fetchTranscript>)
+        .mockResolvedValue(mockTranscript);
 
       const urls = [
         'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
@@ -218,15 +199,13 @@ describe('End-to-End Integration Tests', () => {
 
   describe('Language support', () => {
     it('should handle different language codes', async () => {
-      const mockSubtitles = [
-        { text: 'Hola mundo', start: '0.0', dur: '2.0' }
+      const mockTranscript = [
+        { text: 'Hola mundo', start: 0.0, duration: 2.0 }
       ];
 
-      const { getSubtitles, getVideoDetails } = await import('youtube-captions-scraper');
-      (getSubtitles as jest.MockedFunction<typeof getSubtitles>)
-        .mockResolvedValue(mockSubtitles);
-      (getVideoDetails as jest.MockedFunction<typeof getVideoDetails>)
-        .mockResolvedValue({ title: 'Spanish Video' });
+      const { YoutubeTranscript } = await import('youtube-transcript');
+      (YoutubeTranscript.fetchTranscript as jest.MockedFunction<typeof YoutubeTranscript.fetchTranscript>)
+        .mockResolvedValue(mockTranscript);
 
       const result = await transcriptService.getTranscript('dQw4w9WgXcQ', 'es', 'json');
 

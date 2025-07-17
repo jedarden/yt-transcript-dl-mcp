@@ -56,7 +56,7 @@ describe('YouTubeTranscriptMCPServer', () => {
       expect(listToolsHandler).toBeDefined();
 
       if (listToolsHandler) {
-        const result = listToolsHandler({} as any);
+        const result = listToolsHandler({} as any, {} as any);
         expect(result).toEqual({
           tools: expect.arrayContaining([
             expect.objectContaining({
@@ -110,7 +110,7 @@ describe('YouTubeTranscriptMCPServer', () => {
         }
       };
 
-      const result = await callToolHandler(request);
+      const result = await callToolHandler(request, {} as any);
 
       expect(result).toEqual({
         content: [{
@@ -132,7 +132,7 @@ describe('YouTubeTranscriptMCPServer', () => {
         }
       };
 
-      const result = await callToolHandler(request);
+      const result = await callToolHandler(request, {} as any);
 
       expect(result).toEqual({
         content: [{
@@ -150,7 +150,7 @@ describe('YouTubeTranscriptMCPServer', () => {
         }
       };
 
-      const result = await callToolHandler(request);
+      const result = await callToolHandler(request, {} as any);
 
       expect(result).toEqual({
         content: [{
@@ -168,7 +168,7 @@ describe('YouTubeTranscriptMCPServer', () => {
         }
       };
 
-      const result = await callToolHandler(request);
+      const result = await callToolHandler(request, {} as any);
 
       expect(result).toEqual({
         content: [{
@@ -186,7 +186,7 @@ describe('YouTubeTranscriptMCPServer', () => {
         }
       };
 
-      await expect(callToolHandler(request)).rejects.toThrow();
+      await expect(callToolHandler(request, {} as any)).rejects.toThrow();
     });
 
     it('should throw error for missing required parameters', async () => {
@@ -197,7 +197,7 @@ describe('YouTubeTranscriptMCPServer', () => {
         }
       };
 
-      await expect(callToolHandler(request)).rejects.toThrow();
+      await expect(callToolHandler(request, {} as any)).rejects.toThrow();
     });
   });
 

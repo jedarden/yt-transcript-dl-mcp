@@ -34,7 +34,7 @@ jobs:
         run: npm run lint
 
       - name: Run tests
-        run: echo "Tests temporarily disabled - GHCR fix priority"
+        run: npm run test
 
       - name: Build project
         run: npm run build
@@ -82,34 +82,30 @@ jobs:
 
       - name: Create GitHub Release (if manual trigger)
         if: github.event_name == 'workflow_dispatch'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          release_name: Release v${{ steps.version.outputs.version }}
-          body: |
-            ## Changes
+        run: |
+          gh release create v${{ steps.version.outputs.version }} \
+            --title "Release v${{ steps.version.outputs.version }}" \
+            --notes "## Changes
             
             Automated release for version ${{ steps.version.outputs.version }}
             
             ## Installation
             
-            ```bash
+            \`\`\`bash
             npm install -g yt-transcript-dl-mcp
-            ```
+            \`\`\`
             
             ## Usage
             
-            ```bash
+            \`\`\`bash
             # Start single transport mode
             yt-transcript-dl-mcp
             
             # Start multi-transport mode
             yt-transcript-dl-mcp --multi-transport
-            ```
-          draft: false
-          prerelease: false
+            \`\`\`"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   docker:
     needs: test
