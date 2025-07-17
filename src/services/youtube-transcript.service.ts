@@ -1,4 +1,7 @@
-import { YoutubeTranscript } from 'youtube-transcript';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { Logger } from '../utils/logger.js';
 import { Cache } from '../utils/cache.js';
 import { 
@@ -9,9 +12,58 @@ import {
   PlaylistTranscriptRequest 
 } from '../types/index.js';
 
+const execAsync = promisify(exec);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+interface PythonTranscriptResult {
+  success: boolean;
+  videoId: string;
+  language: string;
+  transcript: Array<{
+    text: string;
+    start: number;
+    duration: number;
+  }>;
+  metadata?: {
+    extractedAt?: string;
+    source: string;
+    itemCount: number;
+    duration: number;
+  };
+  error?: string;
+}
+
+interface PythonListResult {
+  success: boolean;
+  videoId: string;
+  transcripts: Array<{
+    language: string;
+    language_code: string;
+    is_generated: boolean;
+    is_translatable: boolean;
+  }>;
+  error?: string;
+}
+
+interface PythonBulkResult {
+  success: boolean;
+  results: PythonTranscriptResult[];
+  errors: Array<{
+    videoId: string;
+    error: string;
+  }>;
+  summary: {
+    total: number;
+    successful: number;
+    failed: number;
+  };
+}
+
 export class YouTubeTranscriptService {
   private cache: Cache;
   private logger: typeof Logger;
+  private pythonScript: string;
 
   constructor(
     cacheConfig: { ttl: number; maxSize: number; enabled: boolean } = {
@@ -22,6 +74,7 @@ export class YouTubeTranscriptService {
   ) {
     this.cache = new Cache(cacheConfig.ttl, cacheConfig.maxSize, cacheConfig.enabled);
     this.logger = Logger;
+    this.pythonScript = join(__dirname, '../../scripts/youtube_transcript_fetcher.py');
   }
 
   public async getTranscript(
@@ -43,27 +96,36 @@ export class YouTubeTranscriptService {
 
       this.logger.info(`Fetching transcript for video: ${cleanVideoId}`);
 
-      // Try to get transcript using youtube-transcript
-      const transcriptData = await YoutubeTranscript.fetchTranscript(cleanVideoId, {
-        lang: language
-      });
+      // Call Python script to get transcript
+      const command = `python3 "${this.pythonScript}" fetch --video-id "${cleanVideoId}" --language "${language}"`;
+      const { stdout, stderr } = await execAsync(command);
+
+      if (stderr) {
+        this.logger.warn(`Python script warning: ${stderr}`);
+      }
+
+      const pythonResult: PythonTranscriptResult = JSON.parse(stdout);
+
+      if (!pythonResult.success) {
+        throw new Error(pythonResult.error || 'Failed to fetch transcript');
+      }
 
       // Convert to our format
-      const transcript: TranscriptItem[] = transcriptData.map((item: any) => ({
+      const transcript: TranscriptItem[] = pythonResult.transcript.map(item => ({
         text: item.text,
-        start: item.offset / 1000, // Convert ms to seconds
-        duration: item.duration / 1000 // Convert ms to seconds
+        start: item.start,
+        duration: item.duration
       }));
 
       const response: TranscriptResponse = {
         videoId: cleanVideoId,
-        title: 'YouTube Video', // youtube-transcript doesn't provide title
+        title: await this.getVideoTitle(cleanVideoId), // Try to get title
         language,
         transcript,
         metadata: {
           extractedAt: new Date().toISOString(),
-          source: 'youtube-transcript',
-          duration: transcript.reduce((acc, item) => acc + item.duration, 0)
+          source: 'youtube-transcript-api',
+          duration: pythonResult.metadata?.duration || transcript.reduce((acc, item) => acc + item.duration, 0)
         }
       };
 
@@ -84,7 +146,7 @@ export class YouTubeTranscriptService {
         transcript: [],
         metadata: {
           extractedAt: new Date().toISOString(),
-          source: 'youtube-transcript',
+          source: 'youtube-transcript-api',
           error: error instanceof Error ? error.message : 'Unknown error'
         }
       };
@@ -94,49 +156,68 @@ export class YouTubeTranscriptService {
   public async getBulkTranscripts(
     request: BulkTranscriptRequest
   ): Promise<BulkTranscriptResponse> {
-    const results: TranscriptResponse[] = [];
-    const errors: Array<{ videoId: string; error: string }> = [];
+    try {
+      this.logger.info(`Processing bulk request for ${request.videoIds.length} videos`);
 
-    this.logger.info(`Processing bulk request for ${request.videoIds.length} videos`);
+      // Call Python script for bulk processing
+      const videoIds = request.videoIds.map(id => this.extractVideoId(id)).join(',');
+      const command = `python3 "${this.pythonScript}" bulk --video-ids "${videoIds}" --language "${request.language || 'en'}"`;
+      
+      const { stdout, stderr } = await execAsync(command);
 
-    // Process videos with rate limiting
-    for (const videoId of request.videoIds) {
-      try {
-        const response = await this.getTranscript(
-          videoId,
-          request.language,
-          request.outputFormat
-        );
+      if (stderr) {
+        this.logger.warn(`Python script warning: ${stderr}`);
+      }
 
-        if (response.metadata?.error) {
-          errors.push({
-            videoId: this.extractVideoId(videoId),
-            error: response.metadata.error
-          });
-        } else {
-          results.push(response);
-        }
+      const pythonResult: PythonBulkResult = JSON.parse(stdout);
 
-        // Add delay to avoid rate limiting
-        await this.delay(1000);
+      if (!pythonResult.success) {
+        throw new Error('Bulk processing failed');
+      }
 
-      } catch (error) {
-        errors.push({
-          videoId: this.extractVideoId(videoId),
-          error: error instanceof Error ? error.message : 'Unknown error'
+      // Convert results to our format
+      const results: TranscriptResponse[] = [];
+      for (const result of pythonResult.results) {
+        const transcript: TranscriptItem[] = result.transcript.map(item => ({
+          text: item.text,
+          start: item.start,
+          duration: item.duration
+        }));
+
+        results.push({
+          videoId: result.videoId,
+          title: await this.getVideoTitle(result.videoId),
+          language: result.language,
+          transcript,
+          metadata: {
+            extractedAt: new Date().toISOString(),
+            source: 'youtube-transcript-api',
+            duration: result.metadata?.duration || transcript.reduce((acc, item) => acc + item.duration, 0)
+          }
         });
       }
-    }
 
-    return {
-      results,
-      errors,
-      summary: {
-        total: request.videoIds.length,
-        successful: results.length,
-        failed: errors.length
-      }
-    };
+      return {
+        results,
+        errors: pythonResult.errors,
+        summary: pythonResult.summary
+      };
+
+    } catch (error) {
+      this.logger.error(`Failed to process bulk request:`, error);
+      return {
+        results: [],
+        errors: request.videoIds.map(videoId => ({
+          videoId: this.extractVideoId(videoId),
+          error: error instanceof Error ? error.message : 'Unknown error'
+        })),
+        summary: {
+          total: request.videoIds.length,
+          successful: 0,
+          failed: request.videoIds.length
+        }
+      };
+    }
   }
 
   public async getPlaylistTranscripts(
@@ -167,6 +248,41 @@ export class YouTubeTranscriptService {
     }
   }
 
+  public async listTranscripts(videoId: string): Promise<{
+    success: boolean;
+    videoId: string;
+    transcripts: Array<{
+      language: string;
+      language_code: string;
+      is_generated: boolean;
+      is_translatable: boolean;
+    }>;
+    error?: string;
+  }> {
+    try {
+      const cleanVideoId = this.extractVideoId(videoId);
+      const command = `python3 "${this.pythonScript}" list --video-id "${cleanVideoId}"`;
+      
+      const { stdout, stderr } = await execAsync(command);
+
+      if (stderr) {
+        this.logger.warn(`Python script warning: ${stderr}`);
+      }
+
+      const result: PythonListResult = JSON.parse(stdout);
+      return result;
+
+    } catch (error) {
+      this.logger.error(`Failed to list transcripts for video ${videoId}:`, error);
+      return {
+        success: false,
+        videoId: this.extractVideoId(videoId),
+        transcripts: [],
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
   public formatTranscript(
     transcript: TranscriptItem[],
     format: 'text' | 'json' | 'srt'
@@ -188,6 +304,13 @@ export class YouTubeTranscriptService {
     default:
       return JSON.stringify(transcript, null, 2);
     }
+  }
+
+  private async getVideoTitle(videoId: string): Promise<string> {
+    // For now, return a generic title
+    // In a production system, you might want to use YouTube Data API
+    // or extract title from the video page
+    return `YouTube Video ${videoId}`;
   }
 
   private extractVideoId(url: string): string {
@@ -220,10 +343,6 @@ export class YouTubeTranscriptService {
     const milliseconds = Math.floor((seconds % 1) * 1000);
 
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')},${milliseconds.toString().padStart(3, '0')}`;
-  }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   // Cache management methods

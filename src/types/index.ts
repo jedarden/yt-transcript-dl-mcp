@@ -11,7 +11,7 @@ export interface TranscriptResponse {
   transcript: TranscriptItem[];
   metadata?: {
     extractedAt: string;
-    source: 'youtube-transcript' | 'fallback';
+    source: 'youtube-transcript' | 'youtube-transcript-api' | 'fallback';
     duration?: number;
     error?: string;
   };

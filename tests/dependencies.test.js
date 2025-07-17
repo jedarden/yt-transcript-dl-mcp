@@ -44,7 +44,6 @@ describe('Dependency Management', () => {
       'node-cache',
       'uuid',
       'winston',
-      'youtube-transcript',
       'zod'
     ];
     
@@ -63,8 +62,8 @@ describe('Dependency Management', () => {
     // Verify we have the MCP SDK dependency
     expect(packageJson.dependencies).toHaveProperty('@modelcontextprotocol/sdk');
     
-    // Verify we have transcript dependencies
-    expect(packageJson.dependencies).toHaveProperty('youtube-transcript');
+    // Verify we have necessary dependencies (no longer need youtube-transcript as we use Python API)
+    expect(packageJson.dependencies).toHaveProperty('@modelcontextprotocol/sdk');
   });
   
   it('should not have conflicting or duplicate functionality packages', () => {
@@ -81,7 +80,7 @@ describe('Dependency Management', () => {
       dep.includes('youtube') && (dep.includes('transcript') || dep.includes('caption'))
     );
     
-    // We should only have youtube-transcript, not multiple transcript packages
-    expect(transcriptPackages).toEqual(['youtube-transcript']);
+    // We should have no Node.js transcript packages since we use Python API
+    expect(transcriptPackages).toEqual([]);
   });
 });

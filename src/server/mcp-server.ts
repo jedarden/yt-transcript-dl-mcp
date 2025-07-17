@@ -68,6 +68,9 @@ export class YouTubeTranscriptMCPServer {
         case 'clear_cache':
           return await this.handleClearCache();
           
+        case 'list_transcripts':
+          return await this.handleListTranscripts(args);
+          
         default:
           throw new McpError(
             ErrorCode.MethodNotFound,
@@ -215,6 +218,20 @@ export class YouTubeTranscriptMCPServer {
           type: 'object',
           properties: {}
         }
+      },
+      {
+        name: 'list_transcripts',
+        description: 'List all available transcripts for a YouTube video',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            videoId: {
+              type: 'string',
+              description: 'YouTube video ID or URL'
+            }
+          },
+          required: ['videoId']
+        }
       }
     ];
   }
@@ -319,6 +336,23 @@ export class YouTubeTranscriptMCPServer {
       content: [{
         type: 'text',
         text: 'Cache cleared successfully'
+      }]
+    };
+  }
+
+  private async handleListTranscripts(args: any) {
+    const { videoId } = args;
+    
+    if (!videoId) {
+      throw new McpError(ErrorCode.InvalidParams, 'videoId is required');
+    }
+
+    const result = await this.transcriptService.listTranscripts(videoId);
+    
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify(result, null, 2)
       }]
     };
   }
