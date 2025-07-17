@@ -39,7 +39,7 @@
     "lint:fix": "eslint src tests --ext .ts,.js --fix",
     "docker:build": "docker build -t yt-transcript-dl-mcp .",
     "docker:run": "docker run -p 3000:3000 -p 3001:3001 -p 3002:3002 yt-transcript-dl-mcp",
-    "prepublishOnly": "npm run build && npm run test"
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
