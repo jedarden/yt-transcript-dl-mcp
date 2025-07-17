@@ -147,7 +147,7 @@ describe('Docker Build Process', () => {
       try {
         // Test that docker build command would work
         // (We'll mock this since we might not have Docker in CI)
-        const buildCommand = `docker build -t test-app .`;
+        const buildCommand = 'docker build -t test-app .';
         
         // Simulate what should happen in a real build
         const expectedBuildSteps = [

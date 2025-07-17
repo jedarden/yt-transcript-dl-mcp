@@ -36,8 +36,8 @@ describe('Jest ESM Configuration', () => {
     expect(config).toContain('extensionsToTreatAsEsm');
     expect(config).toContain('.js');
     expect(config).toContain('transform: {}');
-    expect(config).toContain("moduleNameMapper");
-    expect(config).toContain("^(\\.{1,2}/.*)\\.js$");
+    expect(config).toContain('moduleNameMapper');
+    expect(config).toContain('^(\\.{1,2}/.*)\\.js$');
   });
   
   it('should handle node: protocol imports', async () => {
