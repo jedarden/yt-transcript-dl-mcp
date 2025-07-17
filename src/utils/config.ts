@@ -1,4 +1,4 @@
-import { ServerConfig, TransportConfig } from '../types';
+import { ServerConfig, TransportConfig } from '../types/index.js';
 
 export const defaultServerConfig: ServerConfig = {
   port: parseInt(process.env.PORT || '3000', 10),

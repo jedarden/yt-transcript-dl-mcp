@@ -1,6 +1,7 @@
 {
   "name": "yt-transcript-dl-mcp",
-  "version": "1.0.2",
+  "version": "1.1.0",
+  "type": "module",
   "description": "YouTube transcript download MCP server with stdio, SSE, and HTTP support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,6 +32,9 @@
     "test:unit": "jest tests/unit",
     "test:integration": "jest tests/integration",
     "test:e2e": "jest tests/e2e",
+    "test:esm": "jest --config=tests/esm-migration/jest.esm.config.js",
+    "test:esm-migration": "./tests/esm-migration/run-esm-tests.sh",
+    "verify:esm": "npm run build && npm run test:esm",
     "lint": "eslint src tests --ext .ts,.js",
     "lint:fix": "eslint src tests --ext .ts,.js --fix",
     "docker:build": "docker build -t yt-transcript-dl-mcp .",
@@ -38,7 +42,7 @@
     "prepublishOnly": "npm run build && npm run test"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.5.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
     "@types/node": "^20.0.0",
     "commander": "^11.1.0",
     "cors": "^2.8.5",

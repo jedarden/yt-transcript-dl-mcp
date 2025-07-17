@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import { BaseTransport } from './base-transport';
+import { BaseTransport } from './base-transport.js';
 import http from 'http';
 
 interface SSEClient {

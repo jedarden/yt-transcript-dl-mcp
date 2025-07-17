@@ -1,9 +1,9 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { BaseTransport } from './base-transport';
-import { SSETransport } from './sse-transport';
-import { HTTPTransport } from './http-transport';
-import { Logger } from '../../utils/logger';
+import { BaseTransport } from './base-transport.js';
+import { SSETransport } from './sse-transport.js';
+import { HTTPTransport } from './http-transport.js';
+import { Logger } from '../../utils/logger.js';
 
 export interface TransportManagerConfig {
   enableStdio?: boolean;

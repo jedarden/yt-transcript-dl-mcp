@@ -1,9 +1,9 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { Logger } from '../utils/logger';
-import { BaseTransport } from './base-transport';
-import { StdioTransport } from './stdio-transport';
-import { SimpleSSETransport } from './simple-sse-transport';
-import { SimpleHTTPTransport } from './simple-http-transport';
+import { Logger } from '../utils/logger.js';
+import { BaseTransport } from './base-transport.js';
+import { StdioTransport } from './stdio-transport.js';
+import { SimpleSSETransport } from './simple-sse-transport.js';
+import { SimpleHTTPTransport } from './simple-http-transport.js';
 
 export interface TransportManagerConfig {
   stdio: {

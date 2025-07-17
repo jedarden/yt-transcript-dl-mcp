@@ -1,7 +1,7 @@
 import { createServer, Server as HttpServer } from 'http';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
-import { BaseTransport, TransportConfig } from './base-transport';
+import { BaseTransport, TransportConfig } from './base-transport.js';
 import express, { Request, Response } from 'express';
 
 export interface SSETransportConfig extends TransportConfig {

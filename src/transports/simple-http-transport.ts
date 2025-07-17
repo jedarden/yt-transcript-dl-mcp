@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { BaseTransport } from './base-transport';
+import { BaseTransport } from './base-transport.js';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import http from 'http';
 

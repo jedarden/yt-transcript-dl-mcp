@@ -6,6 +6,11 @@ module.exports = {
     '**/__tests__/**/*.+(ts|tsx|js)',
     '**/*.(test|spec).+(ts|tsx|js)'
   ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/tests/esm-migration/'
+  ],
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest'
   },

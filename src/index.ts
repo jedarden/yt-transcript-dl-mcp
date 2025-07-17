@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { YouTubeTranscriptMCPServer } from './server/mcp-server';
-import { Logger } from './utils/logger';
-import { defaultServerConfig } from './utils/config';
+import { YouTubeTranscriptMCPServer } from './server/mcp-server.js';
+import { Logger } from './utils/logger.js';
+import { defaultServerConfig } from './utils/config.js';
 
 async function main(): Promise<void> {
   try {
@@ -59,7 +59,7 @@ process.on('unhandledRejection', (reason) => {
   process.exit(1);
 });
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch((error) => {
     Logger.error('Error in main:', error);
     process.exit(1);

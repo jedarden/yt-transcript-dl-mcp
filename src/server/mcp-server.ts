@@ -6,10 +6,10 @@ import {
   McpError,
   ErrorCode
 } from '@modelcontextprotocol/sdk/types.js';
-import { YouTubeTranscriptService } from '../services/youtube-transcript.service';
-import { Logger } from '../utils/logger';
-import { McpTool } from '../types';
-import { TransportManager, TransportManagerConfig } from '../transports/transport-manager';
+import { YouTubeTranscriptService } from '../services/youtube-transcript.service.js';
+import { Logger } from '../utils/logger.js';
+import { McpTool } from '../types/index.js';
+import { TransportManager, TransportManagerConfig } from '../transports/transport-manager.js';
 
 export class YouTubeTranscriptMCPServer {
   private server: Server;

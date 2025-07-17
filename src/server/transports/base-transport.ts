@@ -1,6 +1,6 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
-import { Logger } from '../../utils/logger';
+import { Logger } from '../../utils/logger.js';
 
 export interface TransportConfig {
   name: string;

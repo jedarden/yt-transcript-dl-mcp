@@ -1,5 +1,5 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { BaseTransport } from './base-transport';
+import { BaseTransport } from './base-transport.js';
 
 export class StdioTransport extends BaseTransport {
   private transport?: StdioServerTransport;

@@ -1,5 +1,5 @@
 import winston from 'winston';
-import { ServerConfig } from '../types';
+import { ServerConfig } from '../types/index.js';
 
 export class Logger {
   private static instance: winston.Logger;

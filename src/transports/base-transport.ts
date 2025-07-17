@@ -1,5 +1,5 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { Logger } from '../utils/logger';
+import { Logger } from '../utils/logger.js';
 
 export interface TransportOptions {
   name: string;

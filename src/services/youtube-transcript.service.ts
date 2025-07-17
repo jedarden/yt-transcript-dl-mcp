@@ -1,13 +1,13 @@
 import { YoutubeTranscript } from 'youtube-transcript';
-import { Logger } from '../utils/logger';
-import { Cache } from '../utils/cache';
+import { Logger } from '../utils/logger.js';
+import { Cache } from '../utils/cache.js';
 import { 
   TranscriptItem, 
   TranscriptResponse, 
   BulkTranscriptRequest, 
   BulkTranscriptResponse,
   PlaylistTranscriptRequest 
-} from '../types';
+} from '../types/index.js';
 
 export class YouTubeTranscriptService {
   private cache: Cache;

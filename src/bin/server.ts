@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { YouTubeTranscriptMCPServer } from '../server/mcp-server';
-import { Logger } from '../utils/logger';
-import { defaultServerConfig } from '../utils/config';
+import { YouTubeTranscriptMCPServer } from '../server/mcp-server.js';
+import { Logger } from '../utils/logger.js';
+import { defaultServerConfig } from '../utils/config.js';
 
 const program = new Command();
 
@@ -47,7 +47,7 @@ program
   .option('-f, --format <format>', 'Output format (text, json, srt)', 'json')
   .action(async (videoId, options) => {
     try {
-      const { YouTubeTranscriptService } = await import('../services/youtube-transcript.service');
+      const { YouTubeTranscriptService } = await import('../services/youtube-transcript.service.js');
       const service = new YouTubeTranscriptService();
       
       Logger.info(`Testing transcript extraction for video: ${videoId}`);
