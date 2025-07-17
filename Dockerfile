@@ -27,6 +27,9 @@ RUN npm run build
 # Production stage
 FROM node:18-alpine AS production
 
+# Set environment to production
+ENV NODE_ENV=production
+
 # Install dumb-init
 RUN apk add --no-cache dumb-init
 
@@ -58,8 +61,7 @@ USER nodejs
 # Expose port
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD node -e "console.log('healthy'); process.exit(0);" || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD node -e "console.log('healthy'); process.exit(0);" || exit 1
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]

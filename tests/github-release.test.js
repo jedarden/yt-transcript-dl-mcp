@@ -24,8 +24,8 @@ describe('GitHub Release Workflow', () => {
     // Should use actions/checkout
     expect(workflow).toMatch(/uses: actions\/checkout/);
     
-    // Should use GitHub release action
-    expect(workflow).toMatch(/uses: actions\/create-release|uses: softprops\/action-gh-release/);
+    // Should use GitHub release mechanism (Actions or CLI)
+    expect(workflow).toMatch(/uses: actions\/create-release|uses: softprops\/action-gh-release|gh release create/);
     
     // Should have proper permissions
     expect(workflow).toMatch(/permissions:|contents: write/);

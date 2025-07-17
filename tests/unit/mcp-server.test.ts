@@ -5,7 +5,6 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 // Mock the dependencies
 jest.mock('@modelcontextprotocol/sdk/server/index.js');
 jest.mock('../../src/services/youtube-transcript.service');
-jest.mock('../../src/utils/logger');
 
 const MockServer = Server as jest.MockedClass<typeof Server>;
 
@@ -51,7 +50,7 @@ describe('YouTubeTranscriptMCPServer', () => {
     it('should provide correct tool definitions', () => {
       // Get the handler function from the setRequestHandler call
       const listToolsHandler = mockServerInstance.setRequestHandler.mock.calls
-        .find(call => call[0].method === 'tools/list')?.[1];
+        .find(call => call[0] && JSON.stringify(call[0]).includes('tools/list'))?.[1];
 
       expect(listToolsHandler).toBeDefined();
 
@@ -95,7 +94,7 @@ describe('YouTubeTranscriptMCPServer', () => {
     beforeEach(() => {
       // Get the call tool handler
       callToolHandler = mockServerInstance.setRequestHandler.mock.calls
-        .find(call => call[0].method === 'tools/call')?.[1];
+        .find(call => call[0] && JSON.stringify(call[0]).includes('tools/call'))?.[1];
     });
 
     it('should handle get_transcript tool call', async () => {

@@ -3,9 +3,11 @@ import { YouTubeTranscriptService } from '../../src/services/youtube-transcript.
 import { YoutubeTranscript } from 'youtube-transcript';
 
 // Mock the dependencies
-jest.mock('youtube-transcript');
-jest.mock('../../src/utils/logger');
-jest.mock('../../src/utils/cache');
+jest.mock('youtube-transcript', () => ({
+  YoutubeTranscript: {
+    fetchTranscript: jest.fn(),
+  },
+}));
 
 const mockYoutubeTranscript = YoutubeTranscript as jest.Mocked<typeof YoutubeTranscript>;
 
