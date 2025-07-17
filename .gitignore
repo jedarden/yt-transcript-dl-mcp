@@ -82,4 +82,7 @@ coverage/
 
 # Build artifacts
 *.log
+
+# Swarm directories
 .swarm/
+logs/

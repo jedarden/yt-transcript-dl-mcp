@@ -10,15 +10,15 @@ export class Logger {
         level: config?.level || 'info',
         format: config?.format === 'json' 
           ? winston.format.combine(
-              winston.format.timestamp(),
-              winston.format.errors({ stack: true }),
-              winston.format.json()
-            )
+            winston.format.timestamp(),
+            winston.format.errors({ stack: true }),
+            winston.format.json()
+          )
           : winston.format.combine(
-              winston.format.timestamp(),
-              winston.format.errors({ stack: true }),
-              winston.format.simple()
-            ),
+            winston.format.timestamp(),
+            winston.format.errors({ stack: true }),
+            winston.format.simple()
+          ),
         transports: [
           new winston.transports.Console(),
           new winston.transports.File({ 

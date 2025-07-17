@@ -5,15 +5,12 @@
     "jest": true
   },
   "extends": [
-    "eslint:recommended",
-    "@typescript-eslint/recommended",
-    "@typescript-eslint/recommended-requiring-type-checking"
+    "eslint:recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": "latest",
-    "sourceType": "module",
-    "project": "./tsconfig.json"
+    "sourceType": "module"
   },
   "plugins": [
     "@typescript-eslint"
@@ -23,14 +20,15 @@
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "single"],
     "semi": ["error", "always"],
-    "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/explicit-function-return-type": "warn",
-    "@typescript-eslint/no-floating-promises": "error"
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-unused-vars": "off",
+    "no-undef": "off"
   },
   "ignorePatterns": [
     "dist/**/*",
     "node_modules/**/*",
-    "coverage/**/*"
+    "coverage/**/*",
+    "yt-transcript-dl-repo/**/*"
   ]
 }

@@ -55,20 +55,20 @@ export class SimpleHTTPTransport extends BaseTransport {
           // Handle MCP methods directly
           let result;
           switch (method) {
-            case 'tools/list':
-              result = await this.handleToolsList();
-              break;
+          case 'tools/list':
+            result = await this.handleToolsList();
+            break;
             
-            case 'tools/call':
-              result = await this.handleToolCall(params);
-              break;
+          case 'tools/call':
+            result = await this.handleToolCall(params);
+            break;
             
-            default:
-              return res.status(400).json({
-                jsonrpc: '2.0',
-                id,
-                error: { code: -32601, message: 'Method not found' }
-              });
+          default:
+            return res.status(400).json({
+              jsonrpc: '2.0',
+              id,
+              error: { code: -32601, message: 'Method not found' }
+            });
           }
 
           return res.json({
@@ -176,34 +176,34 @@ export class SimpleHTTPTransport extends BaseTransport {
     
     // Mock tool execution - in a real implementation, this would delegate to the MCP server
     switch (name) {
-      case 'get_transcript':
-        return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({
-              videoId: args.videoId,
-              message: 'HTTP transport is working! (Mock response)',
-              timestamp: new Date().toISOString()
-            }, null, 2)
-          }]
-        };
+    case 'get_transcript':
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            videoId: args.videoId,
+            message: 'HTTP transport is working! (Mock response)',
+            timestamp: new Date().toISOString()
+          }, null, 2)
+        }]
+      };
       
-      case 'get_bulk_transcripts':
-        return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({
-              results: args.videoIds.map((id: string) => ({
-                videoId: id,
-                message: 'HTTP transport bulk processing! (Mock response)'
-              })),
-              timestamp: new Date().toISOString()
-            }, null, 2)
-          }]
-        };
+    case 'get_bulk_transcripts':
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            results: args.videoIds.map((id: string) => ({
+              videoId: id,
+              message: 'HTTP transport bulk processing! (Mock response)'
+            })),
+            timestamp: new Date().toISOString()
+          }, null, 2)
+        }]
+      };
       
-      default:
-        throw new Error(`Unknown tool: ${name}`);
+    default:
+      throw new Error(`Unknown tool: ${name}`);
     }
   }
 

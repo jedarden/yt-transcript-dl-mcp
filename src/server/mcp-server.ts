@@ -50,29 +50,29 @@ export class YouTubeTranscriptMCPServer {
 
       try {
         switch (name) {
-          case 'get_transcript':
-            return await this.handleGetTranscript(args);
+        case 'get_transcript':
+          return await this.handleGetTranscript(args);
           
-          case 'get_bulk_transcripts':
-            return await this.handleGetBulkTranscripts(args);
+        case 'get_bulk_transcripts':
+          return await this.handleGetBulkTranscripts(args);
           
-          case 'get_playlist_transcripts':
-            return await this.handleGetPlaylistTranscripts(args);
+        case 'get_playlist_transcripts':
+          return await this.handleGetPlaylistTranscripts(args);
           
-          case 'format_transcript':
-            return await this.handleFormatTranscript(args);
+        case 'format_transcript':
+          return await this.handleFormatTranscript(args);
           
-          case 'get_cache_stats':
-            return await this.handleGetCacheStats();
+        case 'get_cache_stats':
+          return await this.handleGetCacheStats();
           
-          case 'clear_cache':
-            return await this.handleClearCache();
+        case 'clear_cache':
+          return await this.handleClearCache();
           
-          default:
-            throw new McpError(
-              ErrorCode.MethodNotFound,
-              `Unknown tool: ${name}`
-            );
+        default:
+          throw new McpError(
+            ErrorCode.MethodNotFound,
+            `Unknown tool: ${name}`
+          );
         }
       } catch (error) {
         this.logger.error(`Error handling tool call ${name}:`, error);

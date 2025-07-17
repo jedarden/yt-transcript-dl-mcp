@@ -172,21 +172,21 @@ export class YouTubeTranscriptService {
     format: 'text' | 'json' | 'srt'
   ): string {
     switch (format) {
-      case 'text':
-        return transcript.map(item => item.text).join(' ');
+    case 'text':
+      return transcript.map(item => item.text).join(' ');
       
-      case 'json':
-        return JSON.stringify(transcript, null, 2);
+    case 'json':
+      return JSON.stringify(transcript, null, 2);
       
-      case 'srt':
-        return transcript.map((item, index) => {
-          const start = this.secondsToSrtTime(item.start);
-          const end = this.secondsToSrtTime(item.start + item.duration);
-          return `${index + 1}\n${start} --> ${end}\n${item.text}\n`;
-        }).join('\n');
+    case 'srt':
+      return transcript.map((item, index) => {
+        const start = this.secondsToSrtTime(item.start);
+        const end = this.secondsToSrtTime(item.start + item.duration);
+        return `${index + 1}\n${start} --> ${end}\n${item.text}\n`;
+      }).join('\n');
       
-      default:
-        return JSON.stringify(transcript, null, 2);
+    default:
+      return JSON.stringify(transcript, null, 2);
     }
   }
 

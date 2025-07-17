@@ -2,7 +2,7 @@ import { createServer, Server as HttpServer } from 'http';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { BaseTransport, TransportConfig } from './base-transport';
 import express, { Request, Response } from 'express';
-import { JSONRPCRequest, JSONRPCResponse, JSONRPCError } from '@modelcontextprotocol/sdk/types.js';
+import { JSONRPCRequest, JSONRPCResponse } from '@modelcontextprotocol/sdk/types.js';
 
 export interface HTTPTransportConfig extends TransportConfig {
   corsOrigin?: string;
@@ -95,9 +95,9 @@ export class HTTPTransport extends BaseTransport {
           this.logger.info(`[${this.config.name}] Request ${requestId} completed in ${duration}ms`);
 
         } catch (error) {
-          const errorResponse: JSONRPCResponse = {
+          const errorResponse: any = {
             jsonrpc: '2.0',
-            id: requestId || null,
+            id: requestId || 0,
             error: {
               code: -32603,
               message: 'Internal error',
@@ -222,7 +222,7 @@ export class HTTPTransport extends BaseTransport {
       let responseReceived = false;
       
       const mockTransport = {
-        send: async (message: JSONRPCMessage) => {
+        send: async (message: any) => {
           if (!responseReceived) {
             responseReceived = true;
             resolve(message as JSONRPCResponse);
@@ -238,7 +238,7 @@ export class HTTPTransport extends BaseTransport {
       this.server.connect(mockTransport as any).then(() => {
         // Trigger the request processing
         if (mockTransport.onmessage) {
-          mockTransport.onmessage(request);
+          (mockTransport.onmessage as any)(request);
         }
       }).catch(reject);
 

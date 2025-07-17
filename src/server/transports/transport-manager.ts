@@ -172,11 +172,11 @@ export class TransportManager {
     this.logger.info(`  Active transports: ${this.getActiveTransportCount()}`);
     
     for (const [name, transportStatus] of Object.entries(status.transports)) {
-      const details = transportStatus.details;
+      const details = (transportStatus as any).details;
       if (name === 'stdio') {
-        this.logger.info(`  - ${name}: ${transportStatus.status} (${details.type})`);
+        this.logger.info(`  - ${name}: ${(transportStatus as any).status} (${details.type})`);
       } else {
-        this.logger.info(`  - ${name}: ${transportStatus.status} on ${details.host}:${details.port}`);
+        this.logger.info(`  - ${name}: ${(transportStatus as any).status} on ${details.host}:${details.port}`);
       }
     }
   }

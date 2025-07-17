@@ -93,18 +93,18 @@ export class SimpleSSETransport extends BaseTransport {
           // Handle MCP methods
           let result;
           switch (method) {
-            case 'tools/list':
-              result = await this.handleToolsList();
-              break;
+          case 'tools/list':
+            result = await this.handleToolsList();
+            break;
             
-            case 'tools/call':
-              result = await this.handleToolCall(params);
-              break;
+          case 'tools/call':
+            result = await this.handleToolCall(params);
+            break;
             
-            default:
-              return res.status(400).json({
-                error: `Method not found: ${method}`
-              });
+          default:
+            return res.status(400).json({
+              error: `Method not found: ${method}`
+            });
           }
 
           // Send response via SSE
@@ -220,34 +220,34 @@ export class SimpleSSETransport extends BaseTransport {
     const { name, arguments: args } = params;
     
     switch (name) {
-      case 'get_transcript':
-        return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({
-              videoId: args.videoId,
-              message: 'SSE transport is working! (Mock response)',
-              timestamp: new Date().toISOString()
-            }, null, 2)
-          }]
-        };
+    case 'get_transcript':
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            videoId: args.videoId,
+            message: 'SSE transport is working! (Mock response)',
+            timestamp: new Date().toISOString()
+          }, null, 2)
+        }]
+      };
       
-      case 'get_bulk_transcripts':
-        return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({
-              results: args.videoIds.map((id: string) => ({
-                videoId: id,
-                message: 'SSE transport bulk processing! (Mock response)'
-              })),
-              timestamp: new Date().toISOString()
-            }, null, 2)
-          }]
-        };
+    case 'get_bulk_transcripts':
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            results: args.videoIds.map((id: string) => ({
+              videoId: id,
+              message: 'SSE transport bulk processing! (Mock response)'
+            })),
+            timestamp: new Date().toISOString()
+          }, null, 2)
+        }]
+      };
       
-      default:
-        throw new Error(`Unknown tool: ${name}`);
+    default:
+      throw new Error(`Unknown tool: ${name}`);
     }
   }
 
