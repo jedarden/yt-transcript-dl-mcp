@@ -1,0 +1,69 @@
+# Source files
+src/
+tests/
+examples/
+
+# Development files
+.github/
+.vscode/
+*.test.js
+*.test.ts
+jest.config.js
+tsconfig.json
+.eslintrc.js
+
+# Build artifacts
+coverage/
+.nyc_output/
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Documentation (keep README.md)
+docs/
+*.md
+!README.md
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Git files
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+
+# Package lock files (npm will generate its own)
+package-lock.json
+yarn.lock

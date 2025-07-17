@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  yt-transcript-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - LOG_LEVEL=info
+    healthcheck:
+      test: ["CMD", "node", "dist/health-check.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - yt-transcript-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - yt-transcript-network
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+
+networks:
+  yt-transcript-network:
+    driver: bridge

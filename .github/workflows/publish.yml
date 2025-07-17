@@ -1,0 +1,137 @@
+name: Publish to NPM
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (leave empty for current package.json version)'
+        required: false
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Build project
+        run: npm run build
+
+      - name: Test binary installation
+        run: |
+          npm pack
+          npm install -g yt-transcript-dl-mcp-*.tgz
+          yt-transcript-dl-mcp --help
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Update version (if specified)
+        if: github.event.inputs.version != ''
+        run: npm version ${{ github.event.inputs.version }} --no-git-tag-version
+
+      - name: Get package version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Publish to NPM
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release (if manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          release_name: Release v${{ steps.version.outputs.version }}
+          body: |
+            ## Changes
+            
+            Automated release for version ${{ steps.version.outputs.version }}
+            
+            ## Installation
+            
+            ```bash
+            npm install -g yt-transcript-dl-mcp
+            ```
+            
+            ## Usage
+            
+            ```bash
+            # Start single transport mode
+            yt-transcript-dl-mcp
+            
+            # Start multi-transport mode
+            yt-transcript-dl-mcp --multi-transport
+            ```
+          draft: false
+          prerelease: false
+
+  post-publish:
+    needs: publish
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Verify NPM publication
+        run: |
+          # Wait for NPM to propagate
+          sleep 30
+          
+          # Check if package is available
+          npm view yt-transcript-dl-mcp version
+          
+          # Test installation from NPM
+          npm install -g yt-transcript-dl-mcp
+          
+          # Verify binary works
+          yt-transcript-dl-mcp --help
+
+      - name: Notify success
+        run: |
+          echo "✅ Package successfully published to NPM!"
+          echo "📦 View at: https://www.npmjs.com/package/yt-transcript-dl-mcp"

@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  mcp-server-stdio:
+    build: .
+    container_name: yt-mcp-stdio
+    command: ["node", "dist/index.js", "--stdio"]
+    environment:
+      - MCP_LOG_LEVEL=info
+      - MCP_STDIO_ENABLED=true
+      - MCP_SSE_ENABLED=false
+      - MCP_HTTP_ENABLED=false
+    stdin_open: true
+    tty: true
+
+  mcp-server-sse:
+    build: .
+    container_name: yt-mcp-sse
+    command: ["node", "dist/index.js", "--sse"]
+    ports:
+      - "3456:3456"
+    environment:
+      - MCP_LOG_LEVEL=info
+      - MCP_STDIO_ENABLED=false
+      - MCP_SSE_ENABLED=true
+      - MCP_SSE_PORT=3456
+      - MCP_SSE_HOST=0.0.0.0
+      - MCP_HTTP_ENABLED=false
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3456/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  mcp-server-http:
+    build: .
+    container_name: yt-mcp-http
+    command: ["node", "dist/index.js", "--http"]
+    ports:
+      - "3457:3457"
+    environment:
+      - MCP_LOG_LEVEL=info
+      - MCP_STDIO_ENABLED=false
+      - MCP_SSE_ENABLED=false
+      - MCP_HTTP_ENABLED=true
+      - MCP_HTTP_PORT=3457
+      - MCP_HTTP_HOST=0.0.0.0
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3457/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  mcp-server-all:
+    build: .
+    container_name: yt-mcp-all
+    command: ["node", "dist/index.js"]
+    ports:
+      - "3456:3456"
+      - "3457:3457"
+    environment:
+      - MCP_LOG_LEVEL=info
+      - MCP_STDIO_ENABLED=true
+      - MCP_SSE_ENABLED=true
+      - MCP_HTTP_ENABLED=true
+    stdin_open: true
+    tty: true
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3457/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
