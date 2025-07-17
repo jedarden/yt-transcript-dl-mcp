@@ -34,8 +34,13 @@ npm run build
 ### Docker
 
 ```bash
+# From GitHub Container Registry (recommended)
+docker pull ghcr.io/jedarden/yt-transcript-dl-mcp:latest
+docker run -p 3001:3001 -p 3002:3002 ghcr.io/jedarden/yt-transcript-dl-mcp:latest --multi-transport
+
+# Build from source
 docker build -t yt-transcript-dl-mcp .
-docker run -p 3000:3000 yt-transcript-dl-mcp
+docker run -p 3001:3001 -p 3002:3002 yt-transcript-dl-mcp --multi-transport
 ```
 
 ## Usage
